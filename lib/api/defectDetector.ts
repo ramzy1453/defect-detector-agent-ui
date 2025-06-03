@@ -71,21 +71,15 @@ export class DefectDetector {
 
       buffer += decoder.decode(value, { stream: true });
 
-      // Process lines one by one
-      let lines = buffer.split("\n");
-      buffer = lines.pop() || ""; // keep incomplete line in buffer
+      const lines = buffer.split("\n");
+      buffer = lines.pop() || "";
 
-      for (let line of lines) {
-        line = line.trim();
-        if (line) {
-          onMessage(line); // Call callback with the streamed text
-        }
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (trimmed) onMessage(trimmed);
       }
     }
 
-    // Final flush
-    if (buffer.trim()) {
-      onMessage(buffer.trim());
-    }
+    if (buffer.trim()) onMessage(buffer.trim());
   }
 }

@@ -3,6 +3,7 @@
 import {
   usePreprocessImage,
   useOverlayImage,
+  useAnalyseImageStream,
 } from "@/lib/services/defectDetector";
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,6 +29,8 @@ export default function FiloPage() {
   const preprocessImage = usePreprocessImage();
   const overlayImage = useOverlayImage();
 
+  const analyseImage = useAnalyseImageStream();
+
   const handleRunPipeline = async () => {
     if (!selectedImage || !inputText) return;
     setActiveStep(1);
@@ -35,16 +38,29 @@ export default function FiloPage() {
     try {
       const preprocessedBlob = await preprocessImage.mutateAsync(selectedImage);
       setPreprocessedUrl(preprocessedBlob);
+
       const overlayedBlob = await overlayImage.mutateAsync(preprocessedBlob);
       setOverlayedUrl(overlayedBlob);
-      const markdownResult = `![Overlayed Image](${URL.createObjectURL(
-        overlayedBlob
-      )})\n\n**Context:**\n${inputText}`;
-      setMarkdown(markdownResult);
+
+      setMarkdown("");
       setActiveStep(2);
+
+      analyseImage.mutate({
+        file: new File([overlayedBlob], "overlayed.png", { type: "image/png" }),
+        query: inputText,
+        onMessage: (line: string) => {
+          console.log({ line });
+          const parsed = JSON.parse(line.trim());
+          console.log({ parsed });
+          if (parsed?.event === "RunResponse") {
+            setMarkdown((prev) => prev + " " + parsed?.content);
+          } else {
+            setMarkdown((prev) => prev + `- ${parsed?.content}\n\n`);
+          }
+        },
+      });
     } catch (error) {
       console.error("Error running pipeline:", error);
-      // Handle error appropriately, e.g., show a notification
     }
   };
 
@@ -232,10 +248,10 @@ export default function FiloPage() {
             </CardHeader>
             <CardContent>
               <div className="prose prose-indigo bg-indigo-50 rounded p-4 min-h-[120px]">
-                <ReactMarkdown>
-                  {markdown ||
-                    "*No result yet. Run the pipeline to generate output.*"}
-                </ReactMarkdown>
+                {markdown === "" && (
+                  <p className="text-sm text-indigo-500">Streaming result...</p>
+                )}
+                {markdown !== "" && <ReactMarkdown>{markdown}</ReactMarkdown>}
               </div>
             </CardContent>
           </Card>
