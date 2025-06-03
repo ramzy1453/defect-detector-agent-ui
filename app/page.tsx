@@ -2,6 +2,7 @@
 
 import { zbot } from "@/lib/api";
 import { useEffect, useState } from "react";
+import ReactMarkdown from "react-markdown";
 
 export default function Home() {
   const [message, setMessage] = useState<string>("");
@@ -20,7 +21,13 @@ export default function Home() {
             "What is the defect?",
             (line) => {
               console.log({ line });
-              setMessage((prev) => prev + " " + line);
+              const parsed = JSON.parse(line.trim());
+              console.log({ parsed });
+              if (parsed?.event === "RunResponse") {
+                setMessage((prev) => prev + " " + parsed?.content);
+              } else {
+                setMessage((prev) => prev + `- ${parsed?.content}\n\n`);
+              }
             }
           );
         }}
@@ -28,7 +35,10 @@ export default function Home() {
       />
       (
       <div className="bg-white p-4">
-        <h2 className="text-lg font-semibold mb-2">Message: {message}</h2>
+        <h2 className="text-lg font-semibold mb-2">Message: </h2>
+        <ReactMarkdown>
+          {message || "*No result yet. Run the pipeline to generate output.*"}
+        </ReactMarkdown>
       </div>
       )
     </div>
