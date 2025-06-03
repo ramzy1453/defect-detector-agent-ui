@@ -6,7 +6,7 @@ export function usePreprocessImage() {
     mutationFn: zbot.defectDetector.preprocessImage,
   });
 }
-export function usOoverlayImage() {
+export function useOverlayImage() {
   return useMutation({
     mutationFn: zbot.defectDetector.overlayImage,
   });
