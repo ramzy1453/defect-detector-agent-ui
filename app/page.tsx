@@ -1,7 +1,7 @@
 "use client";
 
 import { zbot } from "@/lib/api";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 
 export default function Home() {
