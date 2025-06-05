@@ -28,7 +28,7 @@ export default function LoadingDialog({ open }: Props) {
             d="M4 12a8 8 0 018-8v8z"
           ></path>
         </svg>
-        <div className="text-lg font-semibold text-indigo-700">
+        <div className="text-lg font-semibold text-white">
           Traitement en cours...
         </div>
         <div className="text-sm text-gray-500 text-center">

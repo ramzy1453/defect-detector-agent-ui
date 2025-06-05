@@ -21,7 +21,7 @@ export default function TimelineAnalyze({
   return (
     <Card className="shadow-lg animate-fade-in-up">
       <CardHeader>
-        <CardTitle className="text-xl text-indigo-700 flex items-center gap-2">
+        <CardTitle className="text-xl text-white flex items-center gap-2">
           <span role="img" aria-label="timeline">
             🪄
           </span>
@@ -55,7 +55,7 @@ export default function TimelineAnalyze({
                 className={`mt-2 text-xs font-semibold
                     ${
                       activeStep === idx
-                        ? "text-indigo-700"
+                        ? "text-white"
                         : idx < activeStep
                         ? "text-green-600"
                         : "text-gray-400"

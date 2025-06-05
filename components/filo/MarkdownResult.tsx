@@ -10,7 +10,7 @@ export default function MarkdownResult({ markdown }: Props) {
   return (
     <Card className="mt-8 shadow-lg animate-fade-in-up">
       <CardHeader>
-        <CardTitle className="text-xl text-indigo-700 flex items-center gap-2">
+        <CardTitle className="text-xl text-white flex items-center gap-2">
           <span role="img" aria-label="note">
             📝
           </span>
@@ -18,10 +18,8 @@ export default function MarkdownResult({ markdown }: Props) {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="prose prose-indigo bg-indigo-50 rounded p-4 min-h-[120px]">
-          {markdown === "" && (
-            <p className="text-sm text-indigo-500">Streaming result...</p>
-          )}
+        <div className="prose prose-indigo text-white rounded p-4 min-h-[120px]">
+          {markdown === "" && <p className="text-sm">Streaming result...</p>}
           {markdown !== "" && <ReactMarkdown>{markdown}</ReactMarkdown>}
         </div>
       </CardContent>

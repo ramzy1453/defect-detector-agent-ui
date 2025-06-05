@@ -15,6 +15,8 @@ import MarkdownResult from "@/components/filo/MarkdownResult";
 import SuccessDialog from "@/components/filo/SuccessDialog";
 import LoadingDialog from "@/components/filo/LoadingDialog";
 import TimelineAnalyze from "@/components/filo/TimelineAnalyze";
+import { ArrowLeftSquare } from "lucide-react";
+import Link from "next/link";
 
 const steps = [
   { label: "Original" },
@@ -22,7 +24,7 @@ const steps = [
   { label: "Overlayed" },
 ];
 
-export default function FiloPage() {
+export default function GeneratePage() {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [inputText, setInputText] = useState<string>("");
   const [preprocessedUrl, setPreprocessedUrl] = useState<Blob | null>(null);
@@ -65,7 +67,7 @@ export default function FiloPage() {
           if (parsed?.event === "RunResponse") {
             setMarkdown((prev) => prev + " " + parsed?.content);
           } else {
-            setMarkdown((prev) => prev + `- ${parsed?.content}\n\n`);
+            setMarkdown((prev) => prev + `# ${parsed?.content}\n\n`);
           }
         },
       });
@@ -100,12 +102,18 @@ export default function FiloPage() {
         onOpenChange={setShowSuccessModal}
         setActiveStep={setActiveStep}
       />
-      <div className="bg-red-100 text-gray-900 min-h-screen flex items-center justify-center">
-        <div className="py-10 flex gap-8 border border-red-300 container mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="bg-black text-white min-h-screen flex items-center justify-center">
+        <div className="py-10 flex gap-8 container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex-1 flex flex-col gap-8">
+            <Button className="mb-4" asChild>
+              <Link href="/">
+                <ArrowLeftSquare /> Home
+              </Link>
+            </Button>
+
             <Card className="shadow-2xl animate-fade-in">
               <CardHeader>
-                <CardTitle className="text-2xl font-bold text-indigo-700 flex items-center gap-2">
+                <CardTitle className="text-2xl font-bold text-white flex items-center gap-2">
                   <span role="img" aria-label="upload">
                     📤
                   </span>
@@ -118,7 +126,7 @@ export default function FiloPage() {
                     type="file"
                     accept="image/*"
                     onChange={handleFileChange}
-                    className="file:bg-indigo-600 file:text-white file:rounded file:px-4 file:py-2 file:mr-4"
+                    className="file:bg-white file:text-black file:rounded file:px-4 file:py-2 file:mr-4"
                     disabled={
                       preprocessImage.isPending || overlayImage.isPending
                     }
@@ -127,7 +135,7 @@ export default function FiloPage() {
                     value={inputText}
                     onChange={(e) => setInputText(e.target.value)}
                     placeholder="Describe the context or add notes..."
-                    className="min-h-[60px] font-mono"
+                    className="min-h-[60px] font-mono text-white"
                     disabled={
                       preprocessImage.isPending || overlayImage.isPending
                     }
