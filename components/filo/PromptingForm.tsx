@@ -44,6 +44,8 @@ export function PromptingForm() {
   >([]);
   const [showClearAll, setShowClearAll] = useState(false);
 
+  console.log({ uploadedImages });
+
   // Handle image upload
   const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
