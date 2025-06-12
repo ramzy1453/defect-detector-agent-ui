@@ -17,15 +17,27 @@ export function useAnalyseImageStream() {
     mutationFn: async ({
       file,
       query,
+      uploadedImages,
+      iclEnabled,
       onMessage,
     }: {
       file: File;
       query: string;
+      uploadedImages?: { file: File; label: string }[];
+      iclEnabled: boolean;
       onMessage: (line: string) => void;
     }) => {
       const formData = new FormData();
+
       formData.append("image", file);
       formData.append("query", query);
+      formData.append("iclEnabled", iclEnabled ? "true" : "false");
+      if (iclEnabled && uploadedImages && uploadedImages.length > 0) {
+        uploadedImages.forEach(({ label, file }) => {
+          formData.append(`labels`, label);
+          formData.append(`files`, file, file.name);
+        });
+      }
 
       const response = await fetch("http://localhost:8000/analyze", {
         method: "POST",

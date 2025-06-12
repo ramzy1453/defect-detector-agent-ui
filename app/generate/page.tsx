@@ -17,6 +17,7 @@ import LoadingDialog from "@/components/filo/LoadingDialog";
 import TimelineAnalyze from "@/components/filo/TimelineAnalyze";
 import { ArrowLeftSquare } from "lucide-react";
 import Link from "next/link";
+import { useIclStore } from "@/hooks/useIcl";
 
 const steps = [
   { label: "Original" },
@@ -28,21 +29,23 @@ export default function GeneratePage() {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [inputText, setInputText] = useState<string>("");
   const [preprocessedUrl, setPreprocessedUrl] = useState<Blob | null>(null);
-  const [overlayedUrl, setOverlayedUrl] = useState<Blob | null>(null);
+  const [overlayedUrl, setOverlayedUrl] = useState<string | null>(null);
   const [markdown, setMarkdown] = useState<string>("");
   const [activeStep, setActiveStep] = useState<number>(0);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
+  const uploadedImages = useIclStore((state) => state.uploadedImages);
+
   const preprocessImage = usePreprocessImage();
-  const overlayImage = useOverlayImage();
+  // const overlayImage = useOverlayImage();
 
   const analyseImage = useAnalyseImageStream();
 
   useEffect(() => {
-    if (preprocessImage.isSuccess || overlayImage.isSuccess) {
+    if (preprocessImage.isSuccess) {
       setShowSuccessModal(true);
     }
-  }, [preprocessImage.isSuccess, overlayImage.isSuccess]);
+  }, [preprocessImage.isSuccess]);
 
   const handleRunPipeline = async () => {
     if (!selectedImage || !inputText) return;
@@ -52,20 +55,26 @@ export default function GeneratePage() {
       const preprocessedBlob = await preprocessImage.mutateAsync(selectedImage);
       setPreprocessedUrl(preprocessedBlob);
 
-      const overlayedBlob = await overlayImage.mutateAsync(preprocessedBlob);
-      setOverlayedUrl(overlayedBlob);
+      // const overlayedBlob = await overlayImage.mutateAsync(preprocessedBlob);
+      // setOverlayedUrl(overlayedBlob);
 
       setMarkdown("");
       setActiveStep(2);
 
       analyseImage.mutate({
-        file: new File([overlayedBlob], "overlayed.png", { type: "image/png" }),
+        file: new File([preprocessedBlob], "overlayed.png", {
+          type: "image/png",
+        }),
+        uploadedImages,
+        iclEnabled: uploadedImages.length > 0,
         query: inputText,
         onMessage: (line: string) => {
           const parsed = JSON.parse(line.trim());
           console.log({ parsed });
           if (parsed?.event === "RunResponse") {
             setMarkdown((prev) => prev + " " + parsed?.content);
+          } else if (parsed?.event === "OverlayedImage") {
+            setOverlayedUrl(`data:${parsed?.mime};base64,${parsed?.content}`);
           } else {
             setMarkdown((prev) => prev + `# ${parsed?.content}\n\n`);
           }
@@ -94,9 +103,7 @@ export default function GeneratePage() {
 
   return (
     <>
-      <LoadingDialog
-        open={preprocessImage.isPending || overlayImage.isPending}
-      />
+      <LoadingDialog open={preprocessImage.isPending} />
       <SuccessDialog
         open={showSuccessModal}
         onOpenChange={setShowSuccessModal}
@@ -127,30 +134,23 @@ export default function GeneratePage() {
                     accept="image/*"
                     onChange={handleFileChange}
                     className="file:bg-white file:text-black file:rounded file:px-4 file:py-2 file:mr-4"
-                    disabled={
-                      preprocessImage.isPending || overlayImage.isPending
-                    }
+                    disabled={preprocessImage.isPending}
                   />
                   <Textarea
                     value={inputText}
                     onChange={(e) => setInputText(e.target.value)}
                     placeholder="Describe the context or add notes..."
                     className="min-h-[60px] font-mono text-white"
-                    disabled={
-                      preprocessImage.isPending || overlayImage.isPending
-                    }
+                    disabled={preprocessImage.isPending}
                   />
                   <Button
                     className="bg-gradient-to-r from-indigo-600 to-pink-500 text-white font-bold py-2 px-6 rounded shadow-lg hover:scale-105 transition"
                     onClick={handleRunPipeline}
                     disabled={
-                      !selectedImage ||
-                      !inputText ||
-                      preprocessImage.isPending ||
-                      overlayImage.isPending
+                      !selectedImage || !inputText || preprocessImage.isPending
                     }
                   >
-                    {preprocessImage.isPending || overlayImage.isPending ? (
+                    {preprocessImage.isPending ? (
                       <span className="flex items-center gap-2">
                         <svg
                           className="w-5 h-5 animate-spin"

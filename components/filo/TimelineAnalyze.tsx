@@ -5,7 +5,7 @@ type Props = {
   steps: { label: string }[];
   selectedImage: File | null;
   preprocessedUrl: Blob | null;
-  overlayedUrl: Blob | null;
+  overlayedUrl: string | null;
   activeStep: number;
   handleStepClick: (stepIndex: number) => void;
 };
@@ -91,7 +91,7 @@ export default function TimelineAnalyze({
             <Image
               width={300}
               height={300}
-              src={URL.createObjectURL(overlayedUrl)}
+              src={overlayedUrl}
               alt="Overlayed"
               className="rounded-xl border-2 border-pink-200 shadow-lg max-h-72 transition-all duration-500"
             />

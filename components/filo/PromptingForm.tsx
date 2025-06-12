@@ -17,6 +17,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useState, ChangeEvent } from "react";
 import Image from "next/image";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { useIclStore } from "@/hooks/useIcl";
 
 const FormSchema = z.object({
   promptingMethod: z.enum(["classic", "icl"], {
@@ -39,9 +40,12 @@ export function PromptingForm() {
     });
   }
 
-  const [uploadedImages, setUploadedImages] = useState<
-    { file: File; query: string }[]
-  >([]);
+  const uploadedImages = useIclStore((state) => state.uploadedImages);
+  const setUploadedImages = useIclStore((state) => state.setUploadedImages);
+  const addImage = useIclStore((state) => state.addImage);
+  const removeImage = useIclStore((state) => state.removeImage);
+  const clearImages = useIclStore((state) => state.clearImages);
+
   const [showClearAll, setShowClearAll] = useState(false);
 
   console.log({ uploadedImages });
@@ -52,16 +56,20 @@ export function PromptingForm() {
     if (!files) return;
     const newImages = Array.from(files).map((file) => ({
       file,
-      query: "",
+      label: "",
     }));
-    setUploadedImages((prev) => [...prev, ...newImages]);
+    addImage(newImages[0]);
     // Reset input value so same file can be uploaded again if needed
     e.target.value = "";
   };
 
   // Remove one image
   const handleRemoveImage = (idx: number) => {
-    setUploadedImages((prev) => prev.filter((_, i) => i !== idx));
+    removeImage(idx);
+    // If no images left, hide the clear all button
+    if (uploadedImages.length === 1) {
+      setShowClearAll(false);
+    }
   };
 
   // Remove all images
@@ -72,9 +80,9 @@ export function PromptingForm() {
 
   // Handle query change for each image
   const handleQueryChange = (idx: number, value: string) => {
-    setUploadedImages((prev) =>
-      prev.map((img, i) => (i === idx ? { ...img, query: value } : img))
-    );
+    const updatedImages = [...uploadedImages];
+    updatedImages[idx].label = value;
+    setUploadedImages(updatedImages);
   };
 
   const promptingMethod = form.watch("promptingMethod");
@@ -164,7 +172,7 @@ export function PromptingForm() {
                 {uploadedImages.map((image, index) => (
                   <li
                     key={index}
-                    className="flex items-center gap-4 bg-gray-50 rounded-md p-2 shadow"
+                    className="flex items-center gap-4 rounded-md p-2 shadow"
                   >
                     <Image
                       width={50}
@@ -179,9 +187,9 @@ export function PromptingForm() {
                     <input
                       type="text"
                       placeholder="Query for this image..."
-                      value={image.query}
+                      value={image.label}
                       onChange={(e) => handleQueryChange(index, e.target.value)}
-                      className="flex-1 border border-gray-300 rounded px-2 py-1"
+                      className="flex-1 border bg-transparent border-gray-300 rounded px-2 py-1"
                     />
                     <Button
                       type="button"
