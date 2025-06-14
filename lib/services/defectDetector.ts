@@ -31,11 +31,11 @@ export function useAnalyseImageStream() {
 
       formData.append("image", file);
       formData.append("query", query);
-      formData.append("iclEnabled", iclEnabled ? "true" : "false");
+      formData.append("icl_enabled", iclEnabled ? "true" : "false");
       if (iclEnabled && uploadedImages && uploadedImages.length > 0) {
         uploadedImages.forEach(({ label, file }) => {
-          formData.append(`labels`, label);
-          formData.append(`files`, file, file.name);
+          formData.append(`icl_labels`, label);
+          formData.append(`icl_files`, file, file.name);
         });
       }
 

@@ -11,25 +11,17 @@ type IclState = {
   clearImages: () => void;
 };
 
-export const useIclStore = create<IclState>()(
-  persist(
-    (set) => ({
-      uploadedImages: [],
-      setUploadedImages: (images) => set({ uploadedImages: images }),
-      addImage: (image) =>
-        set((state) => ({
-          uploadedImages: [...state.uploadedImages, image],
-        })),
-      removeImage: (index) => {
-        set((state) => ({
-          uploadedImages: state.uploadedImages.filter((_, i) => i !== index),
-        }));
-      },
-      clearImages: () => set({ uploadedImages: [] }),
-    }),
-
-    {
-      name: "icl-storage", // unique name for the storage
-    }
-  )
-);
+export const useIclStore = create<IclState>((set) => ({
+  uploadedImages: [],
+  setUploadedImages: (images) => set({ uploadedImages: images }),
+  addImage: (image) =>
+    set((state) => ({
+      uploadedImages: [...state.uploadedImages, image],
+    })),
+  removeImage: (index) => {
+    set((state) => ({
+      uploadedImages: state.uploadedImages.filter((_, i) => i !== index),
+    }));
+  },
+  clearImages: () => set({ uploadedImages: [] }),
+}));

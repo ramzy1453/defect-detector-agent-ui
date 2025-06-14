@@ -1,6 +1,6 @@
-import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import ReactMarkdown from "react-markdown";
+import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 type Props = {
   markdown: string;
@@ -18,9 +18,11 @@ export default function MarkdownResult({ markdown }: Props) {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="prose prose-indigo text-white rounded p-4 min-h-[120px]">
+        <div className="text-white border rounded p-4 prose markdown-body">
           {markdown === "" && <p className="text-sm">Streaming result...</p>}
-          {markdown !== "" && <ReactMarkdown>{markdown}</ReactMarkdown>}
+          {markdown !== "" && (
+            <Markdown remarkPlugins={[remarkGfm]}>{markdown}</Markdown>
+          )}
         </div>
       </CardContent>
     </Card>

@@ -20,7 +20,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useIclStore } from "@/hooks/useIcl";
 
 const FormSchema = z.object({
-  promptingMethod: z.enum(["classic", "icl"], {
+  promptingMethod: z.enum(["direct", "icl"], {
     required_error: "You need to select a notification type.",
   }),
 });
@@ -96,7 +96,7 @@ export function PromptingForm() {
         <FormField
           control={form.control}
           name="promptingMethod"
-          defaultValue="classic"
+          defaultValue="direct"
           render={({ field }) => (
             <FormItem className="space-y-3">
               <FormLabel>Choose Prompting Method</FormLabel>
@@ -108,9 +108,9 @@ export function PromptingForm() {
                 >
                   <FormItem className="flex items-center gap-3">
                     <FormControl>
-                      <RadioGroupItem value="classic" />
+                      <RadioGroupItem value="direct" />
                     </FormControl>
-                    <FormLabel className="font-normal">Classic</FormLabel>
+                    <FormLabel className="font-normal">Direct</FormLabel>
                   </FormItem>
                   <FormItem className="flex items-center gap-3">
                     <FormControl>

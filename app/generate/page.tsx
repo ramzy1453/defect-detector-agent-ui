@@ -76,7 +76,7 @@ export default function GeneratePage() {
           } else if (parsed?.event === "OverlayedImage") {
             setOverlayedUrl(`data:${parsed?.mime};base64,${parsed?.content}`);
           } else {
-            setMarkdown((prev) => prev + `# ${parsed?.content}\n\n`);
+            setMarkdown((prev) => prev + `${parsed?.content}\n\n`);
           }
         },
       });
