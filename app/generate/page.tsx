@@ -33,6 +33,7 @@ export default function GeneratePage() {
   const [markdown, setMarkdown] = useState<string>("");
   const [activeStep, setActiveStep] = useState<number>(0);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [logs, setLogs] = useState<string[]>([]);
 
   const uploadedImages = useIclStore((state) => state.uploadedImages);
 
@@ -71,12 +72,15 @@ export default function GeneratePage() {
         onMessage: (line: string) => {
           const parsed = JSON.parse(line.trim());
           console.log({ parsed });
-          if (parsed?.event === "RunResponse") {
+          if (
+            parsed?.event === "RunResponse" ||
+            parsed?.event === "RunCompleted"
+          ) {
             setMarkdown((prev) => prev + " " + parsed?.content);
           } else if (parsed?.event === "OverlayedImage") {
             setOverlayedUrl(`data:${parsed?.mime};base64,${parsed?.content}`);
           } else {
-            setMarkdown((prev) => prev + `${parsed?.content}\n\n`);
+            setLogs((prev) => [...prev, parsed?.content]);
           }
         },
       });
@@ -195,10 +199,12 @@ export default function GeneratePage() {
               handleStepClick={handleStepClick}
             />
 
-            <MarkdownResult markdown={markdown} />
+            <MarkdownResult markdown={markdown} logs={logs} />
           </div>
         </div>
       </div>
+
+      {/* <MarkdownResult markdown={markdown} /> */}
     </>
   );
 }

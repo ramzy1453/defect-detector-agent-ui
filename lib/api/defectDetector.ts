@@ -24,23 +24,7 @@ export class DefectDetector {
   }
 
   async overlayImage(fileOrBlob: File | Blob): Promise<Blob> {
-    const formData = new FormData();
-
-    const file =
-      fileOrBlob instanceof File
-        ? fileOrBlob
-        : new File([fileOrBlob], "preprocessed.png", { type: "image/png" });
-
-    formData.append("image", file);
-
-    const response = await api.post("/overlay", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-      responseType: "blob",
-    });
-
-    return response.data;
+    return new Promise(() => new Blob([fileOrBlob], { type: "image/png" }));
   }
 
   async analyseImage(
